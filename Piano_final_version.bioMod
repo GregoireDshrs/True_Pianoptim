@@ -1,0 +1,612 @@
+version 4
+
+// The kinematics model originates from (https://simtk.org/projects/wu-shoulder), which is itself based on Holzbaur
+
+
+gravity 0 0 -9.81
+
+segment ground
+endsegment
+
+segment thorax
+    parent ground
+     // translations xz
+    // rotations xyz
+     RT 1.570796 0 0 xyz 0 0 0.3
+    ranges
+        -0.1 0.1
+        -0.1 0.1
+    mass	20
+    com	 -0.03 -0.32 0
+    inertia
+        1.4745	0.000000	0.000000
+        0.000000	0.7555	0.000000
+        0.000000	0.000000	1.4314
+     meshfile thorax.vtp
+endsegment
+
+
+segment spine
+	parent	thorax
+     meshfile hat_spine.vtp
+endsegment
+
+
+segment clavicle_effector_right
+    parent thorax
+    // rotations xyz  // This correspond to a YXZ sequence
+   // rotations xy
+    ranges
+        -0.1 0.1
+        -0.15 0.3
+    RTinmatrix 1
+    RT
+        0.015299995323 -0.994472543667 -0.103812017405   0.006325
+        0.989298697571  0               0.14541602438    0.00693
+       -0.145099955643 -0.10499695182   0.983909164962   0.025465
+        0               0               0                1
+endsegment
+
+
+segment clavicle_right
+    parent clavicle_effector_right
+    RTinmatrix 1
+    RT
+        0.015299995323 0.989298697571 -0.145099955643   0
+       -0.994472543667 0              -0.10499695182    0
+       -0.103812017405 0.14541602438   0.983909164962   0
+        0              0               0                1
+    mass 0.2
+    com -0.0127205 0.00849541 0.0659846
+    meshfile clavicle.vtp
+endsegment
+
+segment scapula_effector_right
+    parent clavicle_right
+    // rotations xyz  // This correspond to a ZYX sequence
+    // rotations xz
+    ranges
+        -0.5  0.1
+        -0.05 0.5
+    RT -0.52 0.52 0 xyz -0.01433 0.02007 0.135535
+endsegment
+segment scapula_right
+    parent scapula_effector_right
+    RT 0.52 -0.52 0 xyz 0 0 0
+    mass 0.5
+    com -0.072 -0.039 -0.065
+    meshfile scapula.vtp
+endsegment
+
+
+
+segment humerus_right
+    parent scapula_right
+    RT 0 0 0 xyz -0.00955 -0.034 0.009
+	 rotations xyz
+
+	ranges
+	    -pi/2 0.1
+        -pi/2 pi/2
+        -pi/4 pi
+
+    mass 2.0325
+    com 0 -0.164502 0
+    inertia
+        0.011946 0 0
+        0 0.004121 0
+        0 0 0.013409
+    meshfile humerus.vtp
+endsegment
+
+
+segment ulna_effector_right
+    parent humerus_right
+    RTinmatrix 1
+    RT
+        0.998779074059439     0                   0.0494000123579900   0.0061
+       -0.00181025108711977   0.999328355607296   0.0366000091559926  -0.2904
+       -0.0493668331166902   -0.0366447496814640  0.998108249694797   -0.0123
+        0                     0                   0                    1
+	 rotations z
+	ranges
+	    0.05 pi*3/4
+endsegment
+segment ulna_right
+    parent ulna_effector_right
+    RTinmatrix 1
+    RT
+        0.998779074059439  -0.00181025108711977 -0.0493668331166902   0
+        0                   0.999328355607296   -0.0366447496814640   0
+        0.0494000123579900  0.0366000091559926   0.998108249694797    0
+        0                   0                    0                    1
+    mass 0.6075
+    com 0 -0.120525 0
+    inertia
+        0.002962 0 0
+        0 0.000618 0
+        0 0 0.003213
+    meshfile ulna.vtp
+endsegment
+
+
+segment radius_effector_right
+    parent ulna_right
+    rotations y
+	ranges
+	     1.40 pi/2
+    RTinmatrix 1
+    RT
+        0.999852739302321   -0.0171609938419917  0                  0.0004
+        0.0170376379745462   0.992665643781517   0.119685582039255 -0.011503
+       -0.00205392353635084 -0.119667957056942   0.992811845946615  0.019999
+        0                    0                   0                  1
+endsegment
+
+segment radius_right
+    parent radius_effector_right
+    RTinmatrix 1
+    RT
+        0.999852739302321   0.0170376379745462 -0.00205392353635084 0
+       -0.0171609938419917  0.992665643781517  -0.119667957056942   0
+        0                   0.119685582039255   0.992811845946615   0
+        0                   0                   0                   1
+    mass 0.6075
+    com 0 -0.120525 0
+    inertia
+        0.002962 0 0
+        0 0.000618 0
+        0 0 0.003213
+    meshfile radius.vtp
+endsegment
+
+
+segment hand_right
+   parent radius_right
+    RT 0 0 0 xyz 0.0171148952815322 -0.230100258785044 0.023770687891017
+     rotations xz
+	ranges
+	   -pi/5 pi/12
+	   -0.5 0.5
+    mass 0.4575
+    com 0 -0.068095 0
+    inertia
+        0.000892 0 0
+        0 0.000547 0
+        0 0 0.00134
+   externalforceindex 0
+endsegment
+
+
+
+
+marker middle_hand
+	    parent hand_right
+	    position 0 -0.04 0
+	    markerindex 0
+	endmarker
+
+    marker thumb
+	    parent hand_right
+	    position 0.035 -0.04 0
+	endmarker
+
+	marker littleFinger
+	    parent hand_right
+	    position -0.035 -0.04 0
+	endmarker
+
+
+
+
+
+
+
+ // keyboard
+segment seg_front
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.5 0
+    mesh 0.15 -0.5 0
+endsegment
+
+
+
+
+segment seg_arr
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.25 0.5 0
+    mesh 0.25 -0.5 0
+endsegment
+
+
+segment seg_Lat_droit
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.5 0
+    mesh 0.25 0.5 0
+endsegment
+
+segment seg_Lat_gauche
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.5 0
+    mesh 0.25 -0.5 0
+endsegment
+
+segment seg_t0
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+   mesh 0.15 0.45 0
+    mesh 0.25 0.45 0
+endsegment
+
+segment seg_t1
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.40 0
+    mesh 0.25 0.40 0
+endsegment
+
+segment seg_t2
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.35 0
+    mesh 0.25  0.35 0
+endsegment
+
+segment seg_t3
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.30 0
+    mesh 0.25 0.30 0
+endsegment
+
+segment seg_t4
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.25 0
+    mesh 0.25 0.25 0
+endsegment
+
+segment seg_t5
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.20 0
+    mesh 0.25 0.20 0
+endsegment
+
+segment seg_t6
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.15 0
+    mesh 0.25 0.15 0
+endsegment
+
+segment seg_t7
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.10 0
+    mesh 0.25 0.10 0
+endsegment
+
+segment seg_t8
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0.05 0
+    mesh 0.25 0.05 0
+endsegment
+
+segment seg_t9
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 0 0
+    mesh 0.25 0 0
+endsegment
+
+segment seg_t10
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.05 0
+    mesh 0.25 -0.05 0
+endsegment
+
+segment seg_t11
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.1 0
+    mesh 0.25 -0.1 0
+endsegment
+
+segment seg_t12
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.15 0
+    mesh 0.25 -0.15 0
+endsegment
+
+segment seg_t13
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.2 0
+    mesh 0.25 -0.2 0
+endsegment
+
+segment seg_t14
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.25 0
+    mesh 0.25 -0.25 0
+endsegment
+
+segment seg_t15
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.3 0
+    mesh 0.25 -0.3 0
+endsegment
+
+segment seg_t16
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.35 0
+    mesh 0.25 -0.35 0
+endsegment
+
+segment seg_t17
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.4 0
+    mesh 0.25 -0.4 0
+endsegment
+
+segment seg_t18
+
+    mass 1
+	inertia
+	  1 0 0
+	  0 1 0
+	  0 0 1
+	com 0 0.1 0
+    mesh 0.15 -0.45 0
+    mesh 0.25 -0.45 0
+endsegment
+
+
+marker accord_1_haut
+    parent ground
+	    position 0.17 0 0.01
+	endmarker
+
+// use this if thumb and little finger are used
+/*
+marker accord_1_haut_a
+    parent ground
+	    position 0.17 0.035 0.01
+	endmarker
+
+marker accord_1_haut_b
+	    parent ground
+	    position 0.17  -0.035 0.01
+	endmarker
+*/
+
+marker accord_1_bas
+    parent ground
+	    position 0.17 0 0
+	endmarker
+/*
+marker accord_1_bas_a
+    parent ground
+	    position 0.17 0.035 0
+	endmarker
+
+marker accord_1_bas_b
+	    parent ground
+	    position 0.17  -0.035 0
+	endmarker
+*/
+
+
+marker accord_2_haut
+    parent ground
+	    position 0.17 -0.149 0.01
+	endmarker
+
+/*
+marker accord_2_haut_a
+    parent ground
+	    position 0.17 -0.113 0.01
+	endmarker
+
+marker accord_2_haut_b
+	    parent ground
+	    position 0.17  -0.184 0.01
+	endmarker
+*/
+
+marker accord_2_bas
+    parent ground
+	    position 0.17 -0.149 0
+	endmarker
+
+/*
+marker accord_2_bas_a
+    parent ground
+	    position 0.17 -0.113 0
+	endmarker
+
+marker accord_2_bas_b
+	    parent ground
+	    position 0.17  -0.184 0
+	endmarker
+*/
+
+
+
+marker accord_3_haut
+    parent ground
+	    position 0.17  -0.29 0.01
+	endmarker
+/*
+marker accord_3_haut_a
+    parent ground
+	    position 0.17 -0.25 0.01
+	endmarker
+
+marker accord_3_haut_b
+	    parent ground
+	    position 0.17  -0.33 0.01
+	endmarker
+*/
+marker accord_3_bas
+    parent ground
+	    position 0.17 -0.29 0
+	endmarker
+
+/*
+marker accord_3_bas_a
+    parent ground
+	    position 0.17 -0.25 0
+	endmarker
+
+marker accord_3_bas_b
+	    parent ground
+	    position 0.17  -0.33 0
+	endmarker
+*/
+
+
+marker m_inter0
+    parent ground
+    position 0.17 -0.075 0.1
+    endmarker
+
+
+marker m_inter1
+    parent ground
+    position 0.17 -0.149 0.1
+    endmarker
+
+marker m_inter2
+    parent ground
+    position 0.17 -0.225 0.1
+    endmarker
+
+
+marker m_inter3
+    parent ground
+    position 0.17 -0.29 0.1
+endmarker
+
